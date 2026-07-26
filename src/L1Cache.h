@@ -224,22 +224,22 @@ public:
         }
     }
 
-    void Load(Memory_op Mem_op,Memory_data_type Memory_data_type, uint32_t addr,L2Cache& l2cache,RAM& ram) {
+    uint32_t Load(Memory_op Mem_op,Memory_data_type Memory_data_type, uint32_t addr,L2Cache& l2cache,RAM& ram) {
         switch (Mem_op) {
             case(Memory_op::READBYTE):
                 switch (Memory_data_type) {
-                case(Memory_data_type::UNSIGN):readByte(addr,l2cache,ram);
-                case(Memory_data_type::SIGN):(int32_t)readByte(addr,l2cache,ram);
+                    case(Memory_data_type::UNSIGN):return readByte(addr,l2cache,ram);
+                    case(Memory_data_type::SIGN):return (int32_t)readByte(addr,l2cache,ram);
                 default: throw runtime_error("Unknown Memory Data Type");
                 }
             case(Memory_op::READHALF):
                 switch (Memory_data_type) {
-                case(Memory_data_type::UNSIGN):readHalfWord(addr,l2cache,ram);
-                case(Memory_data_type::SIGN):(int32_t)readHalfWord(addr,l2cache,ram);
+                    case(Memory_data_type::UNSIGN):return readHalfWord(addr,l2cache,ram);break;
+                    case(Memory_data_type::SIGN):return (int32_t)readHalfWord(addr,l2cache,ram);break;
                 default: throw runtime_error("Unknown Memory Data Type");
                 }
-            case(Memory_op::READWORD):readWord(addr,l2cache,ram);
-            case(Memory_op::NO_MEMORY_OP):break;
+            case(Memory_op::READWORD):return readWord(addr,l2cache,ram);break;
+            case(Memory_op::NO_MEMORY_OP):return 0;
             default: throw runtime_error("Unknown Memory Operation");
         }
     }

@@ -28,6 +28,7 @@ struct ID_EX_data {
     Store_op Store_op;
     Memory_op Memory_op;
     Memory_data_type Memory_data_type;
+    RegFile_op RegFile_op;
 };
 struct EX_MEM_data {
     int valid;
@@ -40,6 +41,7 @@ struct EX_MEM_data {
     uint32_t rd_addr;
     uint32_t rs1_val;
     uint32_t rs2_val;
+    RegFile_op RegFile_op;
 };
 struct MEM_WB_data {
     int valid;
@@ -50,6 +52,8 @@ struct MEM_WB_data {
     uint32_t rd_addr;
     uint32_t rs1_val;
     uint32_t rs2_val;
+    uint32_t data;
+    RegFile_op RegFile_op;
 };
 
 class PipelineRegisters {

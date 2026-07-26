@@ -10,9 +10,11 @@ class ProgramCounter {
 public:
     uint32_t PC_value = 0;
     uint32_t End_value;
+    int enable;
     ProgramCounter(uint32_t entry_point,uint32_t end_point) {
         this->PC_value = entry_point;
         this->End_value = end_point;
+        this->enable = 1;
     }
 
     void StepForward(int step) {
@@ -26,7 +28,6 @@ public:
             return 0;
         }
     }
-    
 
 };
 #endif //RISC_V_CPU_SIMULATOR_PROGRAMCOUNTER_H

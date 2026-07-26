@@ -7,6 +7,11 @@
 #include <iostream>
 #include <bitset>
 using namespace std;
+enum RegFile_op {
+    SAVE_DATA, //save data loaded from cache/mem
+    SAVE_ALU_RESULT,
+    NO_RegFile_OP
+};
 class RegisterFile {
 private:
     array<uint32_t,32> registers;
@@ -36,6 +41,15 @@ public:
     void dump() {
         for (int i=0; i<32; i++) {
             cout<<registers[i]<<" ";
+        }
+    }
+
+    void operate(RegFile_op RegFile_op,uint32_t data, uint32_t ALU_result,uint32_t addr) {
+        switch (RegFile_op) {
+            case SAVE_DATA:write(addr,data);break;
+            case SAVE_ALU_RESULT:write(addr,ALU_result);break;
+            case NO_RegFile_OP:return;
+            default: throw runtime_error("Unknown Register File Operation");
         }
     }
 

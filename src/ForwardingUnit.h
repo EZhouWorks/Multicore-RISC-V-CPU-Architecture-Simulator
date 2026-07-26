@@ -13,6 +13,7 @@ public:
             return 0;
         }
     }
+
 };
 #ifndef RISCV_CPU_FORWARDINGUNIT_H
 #define RISCV_CPU_FORWARDINGUNIT_H

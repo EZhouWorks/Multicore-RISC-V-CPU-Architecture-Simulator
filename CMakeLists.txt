@@ -8,4 +8,5 @@ add_executable(RISCV_CPU
         test.cpp
         CPU/CPU.cpp
         src/ForwardingUnit.h
+        src/StallUnit.h
 )
