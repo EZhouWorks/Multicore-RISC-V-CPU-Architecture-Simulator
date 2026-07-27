@@ -8,12 +8,12 @@
 #include "Controller.h"
 struct IF_ID_data {
     int valid;
-    int drain;
+    int enable;
     uint32_t machine_code;
 };
 struct ID_EX_data {
     int valid;
-    int drain;
+    int enable;
     ALU_op ALU_operation;
     ALU_source ALU_source1;
     ALU_source ALU_source2;
@@ -32,7 +32,7 @@ struct ID_EX_data {
 };
 struct EX_MEM_data {
     int valid;
-    int drain;
+    int enable;
     uint32_t ALU_result;
     Memory_op Memory_op;
     Memory_data_type Memory_data_type;
@@ -45,7 +45,7 @@ struct EX_MEM_data {
 };
 struct MEM_WB_data {
     int valid;
-    int drain;
+    int enable;
     uint32_t ALU_result;
     uint32_t Store_imm;
     Store_op Store_op;
@@ -69,6 +69,11 @@ public:
         MEM_WB_register.valid = 0;
         EX_MEM_register.Memory_op = READBYTE;
         MEM_WB_register.Store_op = STOREBYTE;
+
+        IF_ID_register.enable = 1;
+        ID_EX_register.enable = 1;
+        EX_MEM_register.enable = 1;
+        MEM_WB_register.enable = 1;
     }
 };
 

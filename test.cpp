@@ -43,16 +43,22 @@ void varifyPipeline(CPUcore &core, L2Cache& l2cache, RAM &ram) {
         //
         // lw x1,0(x0)
         0b00000000000000000010000010000011,
-        // add x2,x1,x3
-        0b00000000001100001000000100110011,
-        // add x4,x2,x5
-        0b00000000010100010000001000110011
+
+        // add x2,x1,x1
+        0b00000000000100001000000100110011,
+
+        // lw x3,4(x0)
+        0b00000000010000000010000110000011,
+
+        // add x4,x3,x3
+        0b00000000001100011000001000110011
     };
-    ram.loadCommands(commands, 3,0);
+
+    ram.loadCommands(commands, 4);
     cout<<core.l1_cache.Load(READWORD,UNSIGN,0,l2cache,ram);
 
 
-    for (int i=0;i<9;i++) {
+    for (int i=0;i<15;i++) {
         cout<<endl;
         cout<<"Cycle "<<i<<endl;
         core.Step(l2cache,ram);

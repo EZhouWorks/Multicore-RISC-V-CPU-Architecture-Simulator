@@ -16,7 +16,7 @@
 #include "PipelineRegisters.h"
 #include "ProgramCounter.h"
 #include "StallUnit.h"
-
+#include <bitset>
 class CPUcore {
 public:
     EnableSignals enable_signal;
@@ -28,9 +28,9 @@ public:
     L1Cache l1_cache = L1Cache();
     PipelineRegisters pipeline_registers_write = PipelineRegisters(); //this pipeline register set is write only
     PipelineRegisters pipeline_registers_read = PipelineRegisters();  //this pipeline register set is read only
-    ProgramCounter program_counter = ProgramCounter(0b0,11);
     ForwardingUnit forwarding_unit = ForwardingUnit();
     StallUnit stall_unit = StallUnit();
+    ProgramCounter program_counter = ProgramCounter(0b0,15);
 
     CPUcore(int core_id) {
         this->core_id = core_id;
@@ -53,26 +53,28 @@ public:
 
     void Fetch(L2Cache& l2cache,RAM& ram) {
         if (program_counter.enable == 0) {
-            cout<<"FETCH IN STALL MODE"<<endl;
+            cout<<"FETCHED MACHINE CODE "<<pipeline_registers_write.IF_ID_register.machine_code<<endl;
             return;
         }
         else {
-            if (program_counter.CheckValid() == 1) {
+            if (program_counter.CheckValid() == 1 and pipeline_registers_write.IF_ID_register.enable == 1) {
                 pipeline_registers_write.IF_ID_register.machine_code = CPULoadWord(program_counter.PC_value,l2cache,ram);
                 pipeline_registers_write.IF_ID_register.valid = 1;
-                program_counter.StepForward(4);
-                cout<<"Fetch "<<pipeline_registers_write.IF_ID_register.valid<<endl;
+                cout<<"FETCHED MACHINE CODE "<<pipeline_registers_write.IF_ID_register.machine_code<<endl;
+                if (program_counter.enable == 1) {
+                    program_counter.StepForward(4);
+                }
             }
             else {
                 pipeline_registers_write.IF_ID_register.valid = 0;
-                cout<<"Fetch "<<pipeline_registers_write.IF_ID_register.valid<<endl;
             }
         }
-
         cout<<"FETCH valid "<<pipeline_registers_write.IF_ID_register.valid<<endl;
     }
+
     void Decode() {
         cout<<"decode valid "<<pipeline_registers_read.IF_ID_register.valid<<endl;
+        cout<<"DECODING "<<pipeline_registers_read.IF_ID_register.machine_code<<endl;
         if (pipeline_registers_read.IF_ID_register.valid == 1 or decoder.insert_bubble == 1) { //stall has higher priority than normal drain procedure
             controller.SetControlSignal(decoder.Decode(pipeline_registers_read.IF_ID_register.machine_code)); //decode and generate control singal
 
@@ -82,13 +84,13 @@ public:
                     pipeline_registers_write.ID_EX_register.ALU_operation = NO_ALU_OP; //create bubble, NOP will be passed down for every stall cycle
                     pipeline_registers_write.ID_EX_register.Memory_op = NO_MEMORY_OP;
                     pipeline_registers_write.ID_EX_register.Store_op = NO_STORE_OP;
-                    stall_unit.SetStall(program_counter,decoder);
+                    stall_unit.SetStall(program_counter,decoder,pipeline_registers_write.IF_ID_register);
                     pipeline_registers_write.ID_EX_register.valid = 0;
                     return;
                 }
                 else {
                     cout<<"Stall End1"<<endl;
-                    stall_unit.ExitStall(program_counter,decoder);
+                    stall_unit.ExitStall(program_counter,decoder,pipeline_registers_write.IF_ID_register);
                 }
             }
             else if (controller.ALU_source1 == rs2) {
@@ -96,13 +98,13 @@ public:
                     pipeline_registers_write.ID_EX_register.ALU_operation = NO_ALU_OP;
                     pipeline_registers_write.ID_EX_register.Memory_op = NO_MEMORY_OP;
                     pipeline_registers_write.ID_EX_register.Store_op = NO_STORE_OP;
-                    stall_unit.SetStall(program_counter,decoder);
+                    stall_unit.SetStall(program_counter,decoder,pipeline_registers_write.IF_ID_register);
                     pipeline_registers_write.ID_EX_register.valid = 0;
                     return;
                 }
                 else {
                     cout<<"Stall End2"<<endl;
-                    stall_unit.ExitStall(program_counter,decoder);
+                    stall_unit.ExitStall(program_counter,decoder,pipeline_registers_write.IF_ID_register);
                 }
             }
             else if (controller.ALU_source2 == rs2) {
@@ -110,13 +112,13 @@ public:
                     pipeline_registers_write.ID_EX_register.ALU_operation = NO_ALU_OP;
                     pipeline_registers_write.ID_EX_register.Memory_op = NO_MEMORY_OP;
                     pipeline_registers_write.ID_EX_register.Store_op = NO_STORE_OP;
-                    stall_unit.SetStall(program_counter, decoder);
+                    stall_unit.SetStall(program_counter, decoder,pipeline_registers_write.IF_ID_register);
                     pipeline_registers_write.ID_EX_register.valid = 0;
                     return;
                 }
                 else {
                     cout<<"Stall End3"<<endl;
-                    stall_unit.ExitStall(program_counter,decoder);
+                    stall_unit.ExitStall(program_counter,decoder,pipeline_registers_write.IF_ID_register);
                 }
             }
 
@@ -278,7 +280,20 @@ public:
         Execution();
         Memory(l2cache,ram);
         WriteBack(l2cache,ram);
-        pipeline_registers_read = pipeline_registers_write; //flip value every cycle
+
+        //sync pipeline registers according to enable signals
+        if (pipeline_registers_write.IF_ID_register.enable == 1) {
+            pipeline_registers_read.IF_ID_register = pipeline_registers_write.IF_ID_register;
+        }
+        if (pipeline_registers_write.ID_EX_register.enable == 1) {
+            pipeline_registers_read.ID_EX_register = pipeline_registers_write.ID_EX_register;
+        }
+        if (pipeline_registers_write.EX_MEM_register.enable == 1) {
+            pipeline_registers_read.EX_MEM_register = pipeline_registers_write.EX_MEM_register;
+        }
+        if (pipeline_registers_write.MEM_WB_register.enable == 1) {
+            pipeline_registers_read.MEM_WB_register = pipeline_registers_write.MEM_WB_register;
+        }
     }
 };
 

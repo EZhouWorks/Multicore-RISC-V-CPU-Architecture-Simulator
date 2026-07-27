@@ -5,6 +5,7 @@
 #ifndef RISCV_CPU_STALLUNIT_H
 #define RISCV_CPU_STALLUNIT_H
 #include "ProgramCounter.h"
+#include "PipelineRegisters.h"
 struct EnableSignals {
     int FetchEnable;
     int DecodeEnable;
@@ -26,18 +27,20 @@ public:
         }
     }
 
-    void SetStall(ProgramCounter& program_counter, Decoder& decoder) {
+    void SetStall(ProgramCounter& program_counter, Decoder& decoder, IF_ID_data& IF_ID_Register) {
         if (decoder.insert_bubble == 0) {
             program_counter.enable = 0;
             decoder.insert_bubble = 1;
+            IF_ID_Register.enable = 0;
             cout<<"DECODER INSRT BUBBLE "<<decoder.insert_bubble<<endl;
         }
     }
 
-    void ExitStall(ProgramCounter& program_counter,Decoder& decoder) {
+    void ExitStall(ProgramCounter& program_counter,Decoder& decoder, IF_ID_data& IF_ID_Register) {
         if (decoder.insert_bubble == 1) {
             program_counter.enable = 1;
             decoder.insert_bubble = 0;
+            IF_ID_Register.enable = 1;
             cout<<"Stall END"<<endl;
         }
     }

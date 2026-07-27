@@ -91,7 +91,7 @@ public:
                 case SRA_op: return SRA(x1_value, x2_value);
                 case SLT_op: return SLT(x1_value, x2_value);
                 case SLTU_op: return SLTU(x1_value, x2_value);
-                case NO_ALU_OP: break;
+                case NO_ALU_OP: return 0;
                 default:
                     throw runtime_error("Invalid ALU command");
         }
