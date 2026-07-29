@@ -1,4 +1,4 @@
-# Multicore RISC-V-CPU-Simulator
+# EzhouArch RISC-V-CPU-Simulator
 This is a C++ based multicore RISC-V CPU simulation
 
 1st stage implementation: basic structure 
@@ -9,7 +9,7 @@ This is a C++ based multicore RISC-V CPU simulation
 2nd stage implementation: single cycle  
 1.fetch+decode+execute+memory+write back
 
-3rd stage implementation: 5 stage pipeline  **current stage**  
+3rd stage implementation: 5 stage pipeline 
 1.IF-IF/ID-ID-ID/EX-EX/MEM-MEM/WB-WB 
 2.pipline register  
 
@@ -17,7 +17,7 @@ This is a C++ based multicore RISC-V CPU simulation
 1.forwarding Unit  
 2.Stall Unit  
 
-5st stage implementation: Cache simulation
+5st stage implementation: Cache simulation **->current stage**  
 1.direct mapped 
 2.set associative  
 3.cache statistics
