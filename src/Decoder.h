@@ -5,7 +5,7 @@
 #include<bitset>
 class Decoder {
 public:
-    uint32_t rd,rs1,rs2,I_12bit_imm,I_shamt_imm,SYS_code,Store_imm = 0b0;
+    uint32_t rd,rs1,rs2,I_shamt_imm,SYS_code,I_12bit_imm,Store_imm,B_imm = 0b0;
     int insert_bubble = 0; // allow Decoder to run for bubbles while Fetch starts draining.
     uint32_t Decode(uint32_t machine_code) {
         //machine code dispart (addr)
@@ -15,10 +15,14 @@ public:
         rs1    = (machine_code >> 15) & 0x1F;
         rs2    = (machine_code >> 20) & 0x1F;
         uint32_t funct7 = (machine_code >> 25) & 0x7F;
-        I_12bit_imm = (machine_code >> 20) & 0xFFF;
+        I_12bit_imm = (((machine_code >> 20) & 0xFFF) & 0x800) ? (((machine_code >> 20) & 0xFFF) | 0xFFFFF000) : ((machine_code >> 20) & 0xFFF);
         I_shamt_imm = (machine_code >> 20) & 0x1F;
         SYS_code = I_12bit_imm;
-        Store_imm =(((machine_code >> 25) & 0x7F) << 5)|((machine_code >> 7) & 0x1F);
+        Store_imm = ((((machine_code >> 25) & 0x7F) << 5) | ((machine_code >> 7) & 0x1F)) & 0x800 ? ((((machine_code >> 25) & 0x7F) << 5) | ((machine_code >> 7) & 0x1F)) | 0xFFFFF000 : (((machine_code >> 25) & 0x7F) << 5) | ((machine_code >> 7) & 0x1F);
+        uint32_t raw_B_imm = (((machine_code >> 31) & 1) << 12) | (((machine_code >> 7) & 1) << 11) | (((machine_code >> 25) & 0x3F) << 5) | (((machine_code >> 8) & 0xF) << 1);
+        B_imm = (raw_B_imm & 0x1000) ? (raw_B_imm | 0xFFFFE000) : raw_B_imm;
+        cout<<"BIMM AT DECODER = "<<B_imm<<endl;
+
 
 
         switch (opcode) {
@@ -91,7 +95,7 @@ public:
                 default:return 0;
                 }
             case(0b1100011): //Branch
-                switch(funct7) {
+                switch(funct3) {
                     case(0b000):return 28; //BEQ
                     case(0b001):return 29; //BNE
                     case(0b100):return 30; //BLT

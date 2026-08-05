@@ -6,10 +6,13 @@
 #define RISC_V_CPU_SIMULATOR_PIPELINEREGISTERS_H
 #include <cstdint>
 #include "Controller.h"
+#include "L1Cache.h"
+#include "BranchUnit.h"
 struct IF_ID_data {
     int valid;
     int enable;
     uint32_t machine_code;
+    uint32_t command_PC_value;
 };
 struct ID_EX_data {
     int valid;
@@ -29,6 +32,9 @@ struct ID_EX_data {
     Memory_op Memory_op;
     Memory_data_type Memory_data_type;
     RegFile_op RegFile_op;
+    Branch_op Branch_op;
+    int32_t B_imm;
+    uint32_t command_PC_value;
 };
 struct EX_MEM_data {
     int valid;
@@ -42,6 +48,7 @@ struct EX_MEM_data {
     uint32_t rs1_val;
     uint32_t rs2_val;
     RegFile_op RegFile_op;
+    uint32_t command_PC_value;
 };
 struct MEM_WB_data {
     int valid;
@@ -54,6 +61,7 @@ struct MEM_WB_data {
     uint32_t rs2_val;
     uint32_t data;
     RegFile_op RegFile_op;
+    Memory_op Memory_op;
 };
 
 class PipelineRegisters {

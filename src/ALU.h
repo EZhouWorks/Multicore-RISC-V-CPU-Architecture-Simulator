@@ -2,6 +2,7 @@
 #define RISC_V_CPU_SIMULATOR_ALU_H
 #include <cstdint>
 #include <iostream>
+#include "ProgramCounter.h"
 using namespace std;
 
 enum ALU_op
@@ -16,6 +17,12 @@ enum ALU_op
     SRA_op,
     SLT_op,
     SLTU_op,
+    BEQ_op,
+    BNE_op,
+    BLT_op,
+    BGE_op,
+    BLTU_op,
+    BGEU_op,
     NO_ALU_OP,
 };
 
@@ -77,6 +84,7 @@ private:
             return 0;
         }
     }
+
 public:
     ALU(){};
     uint32_t operate(ALU_op command, uint32_t x1_value = 0, uint32_t x2_value = 0) {
@@ -84,7 +92,7 @@ public:
                 case ADD_op: return ADD(x1_value, x2_value);
                 case SUB_op: return SUB(x1_value, x2_value);
                 case AND_op: return AND(x1_value, x2_value);
-                case OR_op: return OR(x1_value, x2_value);
+                case OR_op:  return OR(x1_value, x2_value);
                 case XOR_op: return XOR(x1_value, x2_value);
                 case SLL_op: return SLL(x1_value, x2_value);
                 case SRL_op: return SRL(x1_value, x2_value);

@@ -10,6 +10,8 @@ class ProgramCounter {
 public:
     uint32_t PC_value = 0;
     uint32_t End_value;
+    int branch_taken = 0; //indicates if branch op activated
+
     int enable;
     ProgramCounter(uint32_t entry_point,uint32_t end_point) {
         this->PC_value = entry_point;
@@ -27,6 +29,12 @@ public:
         else {
             return 0;
         }
+    }
+    void Branch(uint32_t shift_amount,uint32_t command_PC_value) {
+        PC_value = command_PC_value + int32_t(shift_amount);
+        cout<<"Command PC Value = "<<command_PC_value<<endl;
+        cout<<"Shift amount = "<<int32_t(shift_amount)<<endl;
+        cout<<"BRANCHED TO "<<PC_value<<endl;
     }
 
 };
